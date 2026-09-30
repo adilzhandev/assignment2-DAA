@@ -120,3 +120,55 @@ shifts vs list hops), but the array is 9× faster. For n ≤ 1 000 array moves a
 
 **W4.** The ratio comparisons / (n log₂ n) is 1.56, 1.73, 1.80 and 1.84 for the four sizes, which confirms
 Θ(n log n). Most of the cost is in `extractMin`. The benchmark checks that every extracted value is ≥ the previous one.
+
+## 4. Discussion
+
+`DynamicArray.get(i)` is one address calculation and one load, so W1 does not depend on n, while the list follows *i*
+references, which is a real Θ(1) vs Θ(n) difference. W2 is more interesting: both structures perform 74 million
+comparisons, yet the array is 2.8× faster. The array keeps its `int`s contiguous, so one 64-byte cache line holds 16
+values and every loaded byte is useful (spatial locality). The hardware prefetcher recognises the sequential pattern and
+loads the next lines in advance, and the JIT can unroll the simple loop over `data[i]`. In the list every value lives in
+its own 24-byte node, so a cache line holds only 2–3 values together with headers and pointers. Each step
+`cur = cur.next` is pointer chasing: the next address is known only after the current load completes, so loads cannot
+overlap and every cache miss costs the full memory latency. Node objects also give work to the garbage collector, which
+must trace n objects instead of one `int[]`. W3 middle shows the same effect for writes: 10⁸ array shifts (a streaming
+copy) take 14.8 ms, while 10⁸ node hops take 133 ms. So when the asymptotic class is equal, constant factors —
+bytes per element, dependent loads and allocation — decide real time. `MyLinkedList` is the better choice when
+updates happen at the ends or at a node we already reference: in W3 head it is ≈ 1 500× faster, because it changes 3
+links instead of shifting 10⁵ elements. It also never moves elements and has no resize spikes, which suits queues and
+deques. `MinHeap` is the right choice when we repeatedly need the minimum (schedulers, Dijkstra, event simulation):
+`peekMin` is Θ(1) and `extractMin` Θ(log n), instead of a Θ(n) scan each time. Because it is array-based, it keeps the
+cache advantages of the array. For random access, search, iteration and appending, `DynamicArray` is the default.
+
+## 5. Bonus A — memory footprint (JOL)
+
+`GraphLayout.parseInstance(obj).totalSize()` (64-bit JVM, compressed references):
+
+| n | DynamicArray / MinHeap | MyLinkedList | raw `int[n]` |
+|---|---|---|---|
+| 100 000 | 0.50 MB (5.24 B/elem) | 2.29 MB (24.00 B/elem) | 0.38 MB |
+| 1 000 000 | 4.00 MB (4.19 B/elem) | 22.89 MB (24.00 B/elem) | 3.81 MB |
+
+![Memory vs n](results/plots/memory_vs_n.png)
+
+A node takes 24 bytes for 4 bytes of data: a 12-byte object header + 4-byte `int` + 4-byte compressed `next` = 20 bytes,
+padded to 24 by 8-byte alignment. The array needs 4 bytes per element plus a 16-byte header and unused capacity (after
+doubling, capacity is between n and 2n). The list is about 5.7× larger, so fewer useful values fit into cache lines, which
+explains part of §4.
+
+## 6. Bonus B — Floyd `buildHeap` vs n × `insert`
+
+`buildHeap` copies the array and calls bubble-down for nodes `size/2 − 1 … 0`. A node of height *h* moves at most *h*
+levels and there are ≤ n/2^{h+1} such nodes, so the total is Σ h·n/2^{h+1} ≤ n = Θ(n). Repeated `insert` is Θ(n log n)
+in the worst case.
+
+| n = 100 000 | insert: time / comparisons | Floyd: time / comparisons |
+|---|---|---|
+| random input | 1.70 ms / 227 662 | 1.09 ms / 188 424 |
+| descending input | 3.54 ms / 1 468 767 | 0.84 ms / 199 978 |
+
+![buildHeap](results/plots/w5_build_heap.png)
+
+On random input a new value usually stops after one or two levels, so the gap is small (1.2× fewer comparisons). On
+descending input every value climbs to the root: insert needs ≈ 0.88·n log₂ n comparisons, while Floyd stays below 2n,
+which gives 7.3× fewer comparisons and 4.2× less time.
