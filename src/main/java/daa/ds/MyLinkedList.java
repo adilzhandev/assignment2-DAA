@@ -53,7 +53,29 @@ public final class MyLinkedList implements IntList {
 
     @Override
     public int remove(int index) {
-        throw new UnsupportedOperationException("not implemented yet");
+        checkIndex(index, size);
+        Node removed;
+        if (index == 0) {
+            removed = head;
+            head = head.next;
+            metrics.addMoves(1);
+            if (head == null) {
+                tail = null;
+                metrics.addMoves(1);
+            }
+        } else {
+            Node prev = nodeAt(index - 1);
+            removed = prev.next;
+            prev.next = removed.next;
+            metrics.addMoves(1);
+            if (removed == tail) {
+                tail = prev;
+                metrics.addMoves(1);
+            }
+        }
+        metrics.addSteps(1);
+        size--;
+        return removed.value;
     }
 
     @Override
