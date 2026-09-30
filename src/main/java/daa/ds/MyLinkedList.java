@@ -33,7 +33,22 @@ public final class MyLinkedList implements IntList {
 
     @Override
     public void add(int index, int x) {
-        throw new UnsupportedOperationException("not implemented yet");
+        checkIndex(index, size + 1);
+        if (index == size) {
+            add(x);
+            return;
+        }
+        Node node = new Node(x);
+        if (index == 0) {
+            node.next = head;
+            head = node;
+        } else {
+            Node prev = nodeAt(index - 1);
+            node.next = prev.next;
+            prev.next = node;
+        }
+        metrics.addMoves(2);
+        size++;
     }
 
     @Override
