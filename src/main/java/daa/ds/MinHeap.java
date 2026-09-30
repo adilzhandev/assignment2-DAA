@@ -41,6 +41,29 @@ public final class MinHeap {
         return heap[0];
     }
 
+    public void insert(int x) {
+        if (size == heap.length) {
+            grow();
+        }
+        heap[size] = x;
+        metrics.addMoves(1);
+        bubbleUp(size);
+        size++;
+    }
+
+    private void bubbleUp(int i) {
+        while (i > 0) {
+            int parent = (i - 1) / 2;
+            metrics.addSteps(2);
+            metrics.addComparisons(1);
+            if (heap[parent] <= heap[i]) {
+                return;
+            }
+            swap(parent, i);
+            i = parent;
+        }
+    }
+
     private void swap(int i, int j) {
         int tmp = heap[i];
         heap[i] = heap[j];
