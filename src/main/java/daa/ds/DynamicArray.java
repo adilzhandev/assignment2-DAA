@@ -41,7 +41,9 @@ public final class DynamicArray implements IntList {
 
     @Override
     public int get(int index) {
-        throw new UnsupportedOperationException("not implemented yet");
+        checkIndex(index, size);
+        metrics.addSteps(1);
+        return data[index];
     }
 
     @Override
@@ -61,6 +63,12 @@ public final class DynamicArray implements IntList {
     @Override
     public Metrics metrics() {
         return metrics;
+    }
+
+    private static void checkIndex(int index, int bound) {
+        if (index < 0 || index >= bound) {
+            throw new IndexOutOfBoundsException("index " + index + ", size " + bound);
+        }
     }
 
     private void grow() {
