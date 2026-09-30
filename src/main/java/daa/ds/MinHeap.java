@@ -105,6 +105,18 @@ public final class MinHeap {
         }
     }
 
+    public void buildHeap(int[] array) {
+        heap = new int[Math.max(DEFAULT_CAPACITY, array.length)];
+        for (int i = 0; i < array.length; i++) {
+            heap[i] = array[i];
+        }
+        metrics.addMoves(array.length);
+        size = array.length;
+        for (int i = size / 2 - 1; i >= 0; i--) {
+            bubbleDown(i);
+        }
+    }
+
     public boolean isValidHeap() {
         for (int child = 1; child < size; child++) {
             if (heap[(child - 1) / 2] > heap[child]) {
