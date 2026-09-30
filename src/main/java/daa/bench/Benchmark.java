@@ -169,7 +169,15 @@ public final class Benchmark {
     }
 
     private void w5BuildHeap(int n, int[] data) {
+        int[] descending = data.clone();
+        Arrays.sort(descending);
+        for (int i = 0, j = n - 1; i < j; i++, j--) {
+            int tmp = descending[i];
+            descending[i] = descending[j];
+            descending[j] = tmp;
+        }
         buildHeapCase("insert", "floyd", n, data);
+        buildHeapCase("insert_desc", "floyd_desc", n, descending);
     }
 
     private void buildHeapCase(String insertVariant, String floydVariant, int n, int[] input) {
