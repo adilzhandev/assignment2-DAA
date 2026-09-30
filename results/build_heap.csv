@@ -1,0 +1,17 @@
+workload,variant,structure,n,time_ms,steps,moves,comparisons
+W5_build_heap,insert,MinHeap,100,0.0007,388,420,194
+W5_build_heap,floyd,MinHeap,100,0.0004,277,232,184
+W5_build_heap,insert_desc,MinHeap,100,0.0015,960,1180,480
+W5_build_heap,floyd_desc,MinHeap,100,0.0004,286,292,190
+W5_build_heap,insert,MinHeap,1000,0.0078,4464,4494,2232
+W5_build_heap,floyd,MinHeap,1000,0.0042,2786,2482,1857
+W5_build_heap,insert_desc,MinHeap,1000,0.0230,15974,17988,7987
+W5_build_heap,floyd_desc,MinHeap,1000,0.0039,2974,2984,1982
+W5_build_heap,insert,MinHeap,10000,0.1496,45186,51582,22593
+W5_build_heap,floyd,MinHeap,10000,0.0496,28111,24876,18740
+W5_build_heap,insert_desc,MinHeap,10000,0.4750,227260,253544,113630
+W5_build_heap,floyd_desc,MinHeap,10000,0.0654,29974,29984,19982
+W5_build_heap,insert,MinHeap,100000,1.7006,455324,486414,227662
+W5_build_heap,floyd,MinHeap,100000,1.0931,282637,248482,188424
+W5_build_heap,insert_desc,MinHeap,100000,3.5425,2937534,3158876,1468767
+W5_build_heap,floyd_desc,MinHeap,100000,0.8440,299968,299980,199978
