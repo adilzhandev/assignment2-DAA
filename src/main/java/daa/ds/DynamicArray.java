@@ -65,7 +65,14 @@ public final class DynamicArray implements IntList {
 
     @Override
     public boolean contains(int x) {
-        throw new UnsupportedOperationException("not implemented yet");
+        for (int i = 0; i < size; i++) {
+            metrics.addSteps(1);
+            metrics.addComparisons(1);
+            if (data[i] == x) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
