@@ -51,6 +51,47 @@ public final class MinHeap {
         size++;
     }
 
+    public int extractMin() {
+        if (size == 0) {
+            throw new IllegalStateException("heap is empty");
+        }
+        int min = heap[0];
+        metrics.addSteps(1);
+        size--;
+        if (size > 0) {
+            heap[0] = heap[size];
+            metrics.addMoves(1);
+            bubbleDown(0);
+        }
+        return min;
+    }
+
+    private void bubbleDown(int i) {
+        while (true) {
+            int left = 2 * i + 1;
+            if (left >= size) {
+                return;
+            }
+            int right = left + 1;
+            int smallest = left;
+            metrics.addSteps(1);
+            if (right < size) {
+                metrics.addSteps(1);
+                metrics.addComparisons(1);
+                if (heap[right] < heap[left]) {
+                    smallest = right;
+                }
+            }
+            metrics.addSteps(1);
+            metrics.addComparisons(1);
+            if (heap[i] <= heap[smallest]) {
+                return;
+            }
+            swap(i, smallest);
+            i = smallest;
+        }
+    }
+
     private void bubbleUp(int i) {
         while (i > 0) {
             int parent = (i - 1) / 2;
