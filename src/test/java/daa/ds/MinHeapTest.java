@@ -99,4 +99,52 @@ class MinHeapTest {
         assertTrue(h.metrics().comparisons() > 0);
         assertTrue(h.metrics().moves() > 0);
     }
+
+    @Test
+    void buildHeapProducesValidHeap() {
+        Random rnd = new Random(42);
+        int[] data = new int[5_000];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = rnd.nextInt(1000);
+        }
+        MinHeap h = new MinHeap();
+        h.buildHeap(data);
+        assertTrue(h.isValidHeap());
+        assertEquals(data.length, h.size());
+        int prev = Integer.MIN_VALUE;
+        while (!h.isEmpty()) {
+            int cur = h.extractMin();
+            assertTrue(prev <= cur);
+            prev = cur;
+        }
+    }
+
+    @Test
+    void buildHeapUsesFewerComparisonsThanInserts() {
+        int n = 100_000;
+        Random rnd = new Random(42);
+        int[] data = new int[n];
+        for (int i = 0; i < n; i++) {
+            data[i] = rnd.nextInt();
+        }
+        MinHeap floyd = new MinHeap();
+        floyd.buildHeap(data);
+        assertTrue(floyd.metrics().comparisons() < 2L * n, "Floyd must be linear");
+
+        MinHeap byInsert = new MinHeap();
+        java.util.Arrays.sort(data);
+        for (int i = n - 1; i >= 0; i--) {
+            byInsert.insert(data[i]);
+        }
+        assertTrue(byInsert.metrics().comparisons() > floyd.metrics().comparisons());
+    }
+
+    @Test
+    void buildHeapOnEmptyArray() {
+        MinHeap h = new MinHeap();
+        h.buildHeap(new int[0]);
+        assertTrue(h.isEmpty());
+        h.insert(3);
+        assertEquals(3, h.peekMin());
+    }
 }
