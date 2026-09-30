@@ -105,6 +105,15 @@ public final class MinHeap {
         }
     }
 
+    public boolean isValidHeap() {
+        for (int child = 1; child < size; child++) {
+            if (heap[(child - 1) / 2] > heap[child]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void swap(int i, int j) {
         int tmp = heap[i];
         heap[i] = heap[j];
