@@ -43,7 +43,10 @@ public final class MyLinkedList implements IntList {
 
     @Override
     public int get(int index) {
-        throw new UnsupportedOperationException("not implemented yet");
+        checkIndex(index, size);
+        Node node = nodeAt(index);
+        metrics.addSteps(1);
+        return node.value;
     }
 
     @Override
@@ -59,5 +62,20 @@ public final class MyLinkedList implements IntList {
     @Override
     public Metrics metrics() {
         return metrics;
+    }
+
+    private Node nodeAt(int index) {
+        Node cur = head;
+        for (int i = 0; i < index; i++) {
+            cur = cur.next;
+        }
+        metrics.addSteps(index);
+        return cur;
+    }
+
+    private static void checkIndex(int index, int bound) {
+        if (index < 0 || index >= bound) {
+            throw new IndexOutOfBoundsException("index " + index + ", size " + bound);
+        }
     }
 }
