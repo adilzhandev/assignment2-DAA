@@ -81,3 +81,42 @@ Let *r* be the index bubble-down starts from (0 in `extractMin`).
 - **Conclusion.** In `extractMin` the removed root was the minimum, and after bubble-down the remaining values form a
   heap again, so n calls return values in non-decreasing order. In `buildHeap`, applying the result to
   *r* = `size/2−1, …, 0` makes the whole array a heap.
+
+## 3. Results
+
+All charts use log-log axes: slope 1 means linear growth, a flat line means Θ(1). Lines overlap where values are
+identical (e.g. steps = comparisons in W2).
+
+![Time vs n](results/plots/time_vs_n.png)
+
+Key numbers at n = 100 000:
+
+| Workload | DynamicArray | MyLinkedList | Operations (array / list) |
+|---|---|---|---|
+| W1: 10 000 × `get` | 0.062 ms | 686.9 ms | steps: 10 000 / 502 499 208 |
+| W2: 1 000 × `contains` | 52.6 ms | 148.7 ms | comparisons: 74 174 335 / 74 174 335 |
+| W3 head: 1 000 + 1 000 | 29.6 ms | 0.019 ms | moves: 200 999 000 / 3 000 |
+| W3 middle: 1 000 + 1 000 | 14.8 ms | 133.2 ms | array moves 100 999 000 / list steps 99 999 000 |
+| W4: n × `insert` + n × `extractMin` | — | — | MinHeap: 13.3 ms, 3 059 125 comparisons |
+
+![W1](results/plots/w1_random_access.png)
+
+**W1.** The array line is flat (1 step per `get`, ≈ 6 ns). The list walks ≈ n/2 nodes per call, so time and steps grow
+linearly.
+
+![W2](results/plots/w2_search.png)
+
+**W2.** Both structures do exactly the same number of steps and comparisons (≈ 0.75·n per query), yet the list is
+2.7–2.9× slower at every n. This is the "same Big-O, different time" case explained in §4.
+
+![W3](results/plots/w3_insert_remove.png)
+
+**W3.** At the head the list needs 3 link updates per insert/remove pair (3 000 moves for any n) and stays flat, while the
+array shifts all elements: ≈ 1 500× slower at n = 100 000. In the middle both do ≈ 10⁸ elementary operations (array
+shifts vs list hops), but the array is 9× faster. For n ≤ 1 000 array moves also include resize copies
+(e.g. 1 920 extra moves for n = 100).
+
+![W4](results/plots/w4_priority.png)
+
+**W4.** The ratio comparisons / (n log₂ n) is 1.56, 1.73, 1.80 and 1.84 for the four sizes, which confirms
+Θ(n log n). Most of the cost is in `extractMin`. The benchmark checks that every extracted value is ≥ the previous one.
