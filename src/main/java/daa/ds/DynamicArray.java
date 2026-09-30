@@ -31,7 +31,16 @@ public final class DynamicArray implements IntList {
 
     @Override
     public void add(int index, int x) {
-        throw new UnsupportedOperationException("not implemented yet");
+        checkIndex(index, size + 1);
+        if (size == data.length) {
+            grow();
+        }
+        for (int i = size; i > index; i--) {
+            data[i] = data[i - 1];
+        }
+        metrics.addMoves(size - index);
+        data[index] = x;
+        size++;
     }
 
     @Override
