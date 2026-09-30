@@ -45,7 +45,15 @@ public final class DynamicArray implements IntList {
 
     @Override
     public int remove(int index) {
-        throw new UnsupportedOperationException("not implemented yet");
+        checkIndex(index, size);
+        int removed = data[index];
+        metrics.addSteps(1);
+        for (int i = index; i < size - 1; i++) {
+            data[i] = data[i + 1];
+        }
+        metrics.addMoves(size - 1 - index);
+        size--;
+        return removed;
     }
 
     @Override
